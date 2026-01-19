@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./index.css";
+const BASE = import.meta.env.BASE_URL;
 
 type Vehicle = {
   name: string;
@@ -13,26 +14,28 @@ export default function App() {
   const today = new Date();
 
   const vehicles: Vehicle[] = [
-    {
-      name: "BMW iX3",
-      image: "/bmw-ix3.png",
-      start: new Date("2023-05-30"),
-      end: new Date("2027-05-30"),
-      maxKm: 62500,
-    },
-    {
-      name: "Cupra Formentor",
-      image: "/cupra-formentor.png",
-      start: new Date("2025-01-17"),
-      end: new Date("2027-01-17"),
-      maxKm: 32500,
-    },
-  ];
+  {
+    name: "BMW iX3",
+    image: `${BASE}bmw-ix3.png`,
+    start: new Date("2023-05-30"),
+    end: new Date("2027-05-30"),
+    maxKm: 62500,
+  },
+  {
+    name: "Cupra Formentor",
+    image: `${BASE}cupra-formentor.png`,
+    start: new Date("2025-01-17"),
+    end: new Date("2027-01-17"),
+    maxKm: 32500,
+  },
+];
 
-  const [kms, setKms] = useState<Record<string, number>>({
-    "BMW iX3": 0,
-    "Cupra Formentor": 0,
+
+  const [kms, setKms] = useState<Record<string, number | "">>({
+    "BMW iX3": "",
+    "Cupra Formentor": "",
   });
+
 
   const calc = (v: Vehicle) => {
     const totalDays = (v.end.getTime() - v.start.getTime()) / 86400000;
@@ -42,7 +45,9 @@ export default function App() {
     );
     const perDay = v.maxKm / totalDays;
     const allowed = perDay * elapsedDays;
-    const diff = allowed - kms[v.name];
+    const currentKm = Number(kms[v.name] || 0);
+    const diff = allowed - currentKm;
+
 
     return { totalDays, elapsedDays, perDay, allowed, diff };
   };
@@ -57,7 +62,7 @@ export default function App() {
           const ok = c.diff >= 0;
 
           return (
-            <div className="card" key={v.name}>
+            <div className={`card ${v.name === "BMW iX3" ? "car-bmw" : ""}`} key={v.name}>
               <img src={v.image} alt={v.name} />
               <h2>{v.name}</h2>
 
